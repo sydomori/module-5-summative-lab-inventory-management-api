@@ -66,7 +66,8 @@ def get_item(item_id):
     item = next((i for i in items if i.id == item_id), None)
     if item:
         return jsonify(item.to_dict()), 200
-    return jsonify({"error": "Item not found"}), 400
+    else:
+        return jsonify({"error": "Item not found"}), 404
 
 @app.route('/api/inventory', methods=['POST'])
 def add_item():
