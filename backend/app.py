@@ -63,7 +63,34 @@ def get_item(item_id):
     item = next((i for i in items if i.id == item_id), None)
     if item:
         return jsonify(item.to_dict()), 200
-    return jsonify({"error": "Item not found"}), 404
+    return jsonify({"error": "Item not found"}), 400
+
+@app.route('/api/inventory', methods=['POST'])
+def add_item():
+    data = request.get_json()
+    barcode = data.get('barcode')
+
+    if not barcode:
+        return jsonify({"error": "Barcode is required"}), 400
+    
+    product_data = fetch_openfoodfacts_data(barcode)
+
+    if product_data is None:
+        return jsonify({"error": "Product not found in OpenFoodFacts"}), 404
+    
+    new_id = max(item.id for item in items) + 1 if items else 1
+    new_item = Item(
+        id=new_id,
+        barcode=barcode,
+        name=product_data["name"],
+        brand=product_data["brand"],
+        ingredients=product_data["ingredients"],
+        in_stock=data.get('in_stock',0),
+        price=data.get('price', 0.0)
+    )
+    items.append(new_item)
+    return jsonify(new_item.to_dict()), 201
+
 
 if __name__ == '__main__':
     # Sample items for demonstration purposes
