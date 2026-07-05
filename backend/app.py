@@ -53,3 +53,16 @@ def fetch_openfoodfacts_data(barcode):
         "brand" : product.get("brands", "Unknown Brand"),
         "ingredients" : product.get("ingredients_text", "Unknown Ingredients")
     }
+
+@app.route('/api/inventory', methods=['GET'])
+def get_items():
+    return jsonify([item.to_dict() for item in items]), 200
+
+
+if __name__ == '__main__':
+    # Sample items for demonstration purposes
+    items = [
+        Item(1, "1234567890123", "Sample Product 1", "Brand A", "Ingredient 1, Ingredient 2", True, 9.99),
+        Item(2, "9876543210987", "Sample Product 2", "Brand B", "Ingredient 3, Ingredient 4", False, 14.99)
+    ]
+    app.run(debug=True, port=5000)
