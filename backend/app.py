@@ -58,6 +58,12 @@ def fetch_openfoodfacts_data(barcode):
 def get_items():
     return jsonify([item.to_dict() for item in items]), 200
 
+@app.route('/api/inventory/<int:item_id>', methods=['GET'])
+def get_item(item_id):
+    item = next((i for i in items if i.id == item_id), None)
+    if item:
+        return jsonify(item.to_dict()), 200
+    return jsonify({"error": "Item not found"}), 404
 
 if __name__ == '__main__':
     # Sample items for demonstration purposes
