@@ -105,6 +105,15 @@ def update_item(item_id):
     else:
         return jsonify({"error": "Item not found"}), 404
 
+@app.route('/api/inventory/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    global items
+    item = next((i for i in items if i.id == item_id), None)
+    if item:
+        items = [i for i in items if i.id != item_id]
+        return jsonify({"message": "Item deleted"}), 200
+    else:
+        return jsonify({"error": "Item not found"}), 404
 
 
 
