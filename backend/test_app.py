@@ -77,3 +77,29 @@ def test_add_item_product_not_found(client):
         assert response.status_code == 404
         data = response.get_json()
         assert 'error' in data
+
+#PATCH item tests
+def test_update_item_success(client):
+    # Add a test item
+    test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
+    items.append(test_item)
+
+    response = client.patch('/api/inventory/1', json={
+        "in_stock": 20,
+        "price": 6.99
+    })
+    
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['in_stock'] == 20
+    assert data['price'] == 6.99
+    assert data['name'] == "Test Product"  # Ensure other fields remain unchanged   
+
+
+def test_update_item_not_found(client):
+    response = client.patch('/api/inventory/999', json={
+        "in_stock": 20
+    })
+    assert response.status_code == 404
+    data = response.get_json()
+    assert 'error' in data
