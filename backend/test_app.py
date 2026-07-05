@@ -1,5 +1,6 @@
 import pytest
 from app import app, items, Item
+from unittest.mock import patch
 
 @pytest.fixture
 def client():
@@ -42,3 +43,37 @@ def test_get_one_item_not_found(client):
     assert response.status_code == 404
     data = response.get_json()
     assert 'error' in data
+
+#add_item tests
+def test_add_item(client):
+    fake_product_data = {
+        "name": "Test Product",
+        "brand": "Test Brand",
+        "ingredients": "Test Ingredient 1, Test Ingredient 2"
+    }
+
+    with patch('app.fetch_openfoodfacts_data', return_value=fake_product_data):
+        response = client.post('/api/inventory', json={
+            "barcode": "1234567890123",
+            "in_stock": 10,
+            "price": 5.99
+        })
+        assert response.status_code == 201
+        data = response.get_json()
+        assert data['name'] == "Test Product"
+        assert data['brand'] == "Test Brand"
+        assert data['barcode'] == "1234567890123"
+        assert data['in_stock'] == 10
+        assert data['price'] == 5.99     
+
+#add item tests for error cases
+def test_add_item_product_not_found(client):
+    with patch('app.fetch_openfoodfacts_data', return_value=None):
+        response = client.post('/api/inventory', json={
+            "barcode": "0000000000000",
+            "in_stock": 5,
+            "price": 3.99
+        })
+        assert response.status_code == 404
+        data = response.get_json()
+        assert 'error' in data
