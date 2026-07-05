@@ -1,5 +1,6 @@
 import pytest
-from app import app, items, Item
+import app as app_module
+from app import app, Item
 from unittest.mock import patch
 
 @pytest.fixture
@@ -7,7 +8,7 @@ def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
-        items.clear()  # Clear items after each test to ensure isolation
+        app_module.items.clear()  # Clear items after each test to ensure isolation
 
 def test_get_items_empty(client):
     response = client.get('/api/inventory')
@@ -17,7 +18,7 @@ def test_get_items_empty(client):
 def test_get_items_with_items(client):
     # Add a test item
     test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
-    items.append(test_item)
+    app_module.items.append(test_item)
 
     response = client.get('/api/inventory')
     assert response.status_code == 200
@@ -30,7 +31,7 @@ def test_get_items_with_items(client):
 def test_get_one_item_found(client):
     # Add a test item
     test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
-    items.append(test_item)
+    app_module.items.append(test_item)
 
     response = client.get('/api/inventory/1')
     assert response.status_code == 200
@@ -82,7 +83,7 @@ def test_add_item_product_not_found(client):
 def test_update_item_success(client):
     # Add a test item
     test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
-    items.append(test_item)
+    app_module.items.append(test_item)
 
     response = client.patch('/api/inventory/1', json={
         "in_stock": 20,
@@ -103,3 +104,16 @@ def test_update_item_not_found(client):
     assert response.status_code == 404
     data = response.get_json()
     assert 'error' in data
+
+#DELETE item tests
+def test_delete_item_success(client):
+    # Add a test item
+    test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
+    app_module.items.append(test_item)
+
+    response = client.delete('/api/inventory/1')
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "message" in data
+    assert len(app_module.items) == 0  # Ensure the item was removed from the list 
