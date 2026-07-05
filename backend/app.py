@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import requests
 
 
 app = Flask(__name__)
@@ -27,3 +28,28 @@ class Item:
             'in_stock': self.in_stock,
             'price': self.price
         }
+
+def fetch_openfoodfacts_data(barcode):
+    # Fetch product data from OpenFoodFacts API using the provided barcode
+    url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code != 200:
+        return None
+    
+    # Parse the JSON response
+    data = response.json()
+
+    # Check if the product was found and return relevant information
+    # status 1 indicates that the product was found, while status 0 indicates that it was not found
+    if data.get('status') != 1:
+        return None
+    
+    # Extract relevant product information from the response
+    product = data.get('product', {})
+    return {
+        "name" : product.get("product_name", "Unknown Product"),
+        "brand" : product.get("brands", "Unknown Brand"),
+        "ingredients" : product.get("ingredients_text", "Unknown Ingredients")
+    }
