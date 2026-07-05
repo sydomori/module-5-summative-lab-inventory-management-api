@@ -91,6 +91,22 @@ def add_item():
     items.append(new_item)
     return jsonify(new_item.to_dict()), 201
 
+@app.route('/api/inventory/<int:item_id>', methods=['PATCH'])
+def update_item(item_id):
+    data = request.get_json()
+    item = next((i for i in items if i.id == item_id), None)
+    if item:
+        item.name  = data.get('name', item.name)
+        item.brand = data.get('brand', item.brand)
+        item.ingredients = data.get('ingredients', item.ingredients)
+        item.in_stock = data.get('in_stock', item.in_stock)
+        item.price = data.get('price', item.price)
+        return jsonify(item.to_dict()), 200
+    else:
+        return jsonify({"error": "Item not found"}), 404
+
+
+
 
 if __name__ == '__main__':
     # Sample items for demonstration purposes
