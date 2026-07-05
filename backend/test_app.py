@@ -24,3 +24,21 @@ def test_get_items_with_items(client):
     assert len(data) == 1
     assert data[0]['name'] == "Test Product"
     assert data[0]['barcode'] == "1234567890123"
+
+#get_item tests
+def test_get_one_item_found(client):
+    # Add a test item
+    test_item = Item(id=1, barcode="1234567890123", name="Test Product", brand="Test Brand", ingredients="Test Ingredients", in_stock=10, price=5.99)
+    items.append(test_item)
+
+    response = client.get('/api/inventory/1')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['id'] == 1
+    assert data['name'] == "Test Product"
+
+def test_get_one_item_not_found(client):
+    response = client.get('/api/inventory/999')
+    assert response.status_code == 404
+    data = response.get_json()
+    assert 'error' in data
