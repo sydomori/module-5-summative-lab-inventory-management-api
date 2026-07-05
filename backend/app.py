@@ -30,10 +30,7 @@ class Item:
         }
 
 # Sample items for demonstration purposes
-items = [
-    Item(1, "1234567890123", "Sample Product 1", "Brand A", "Ingredient 1, Ingredient 2", 50, 9.99),
-    Item(2, "9876543210987", "Sample Product 2", "Brand B", "Ingredient 3, Ingredient 4", 0, 14.99)
-]
+items = []
 
 def fetch_openfoodfacts_data(barcode):
     # Fetch product data from OpenFoodFacts API using the provided barcode
