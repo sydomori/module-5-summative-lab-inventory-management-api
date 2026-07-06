@@ -35,7 +35,12 @@ items = []
 def fetch_openfoodfacts_data(barcode):
     # Fetch product data from OpenFoodFacts API using the provided barcode
     url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
-    response = requests.get(url)
+    # Using a browser-style User-Agent here because OpenFoodFacts' server
+    # was returning 403 Forbidden with a plain custom User-Agent string.
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)   
 
     # Check if the request was successful
     if response.status_code != 200:
