@@ -29,11 +29,45 @@ export default function App(){
         setLoading(false)
       })
   }
-  
+
   /* Fetch the items when the component mounts */
   useEffect(() => {
     fetchItems()
   }, [])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setFormError(null)
+
+    fetch('/api/inventory', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        barcode,
+        in_stock: Number(inStock, 10),
+        price: Number(price),
+      }),
+    })
+      .then((response) => {
+        if(!response.ok){
+          return response.json().then((data) => {
+            throw new Error(data.error || 'Failed to add item')
+          })
+        }
+        return response.json()
+      })
+      .then((data) => {
+        setBarcode('')
+        setInStock('')
+        setPrice('')
+        fetchItems()
+      })
+      .catch((error) => {
+        setFormError(error.message)
+      })
+  }
 
   if (loading) {
     return <div>Loading Inventory...</div>
@@ -46,7 +80,7 @@ export default function App(){
   return (
     <div>
       <h1>Inventory</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input 
           type="text"
           placeholder="Barcode"
