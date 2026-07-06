@@ -27,7 +27,7 @@ export default function App(){
     setEditPrice('')
   }
 
-  const handleUpdate = (e) => {
+  const handleUpdate = (id) => {
     fetch(`/api/inventory/${id}`,{
       method: 'PATCH',
       headers: {
@@ -176,7 +176,32 @@ export default function App(){
         <ul>
           {items.map((item) => (
             <li key={item.id}>
-              {item.name} <br /> -brand: {item.brand} <br /> - ingredients: {item.ingredients} <br /> - price: ${item.price} <br /> - stock: {item.in_stock}
+              {editingId === item.id ? (
+                <>
+                <input 
+                  label="In Stock"
+                  type="number"
+                  value={editInStock}
+                  onChange={(e) => setEditInStock(e.target.value)}
+                />
+
+                <input 
+                  label="Price"
+                  type="number"
+                  step="0.01"
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                />
+                <button onClick={() => handleUpdate(item.id)}>Save</button>
+                <button onClick={cancelEditing}>Cancel</button>
+                </>
+              ) : (
+                <>
+                - name: {item.name} <br /> -brand: {item.brand} <br /> - ingredients: {item.ingredients} <br /> - price: ${item.price} <br /> - stock: {item.in_stock} <br />
+                <button style={{"marginRight": "10px"}} onClick={() => startEditing(item)}>Edit</button>
+                <button onClick={() => handleDelete(item.id)}>Delete</button>
+                </>
+              )}
             </li>
           ))}
         </ul>
