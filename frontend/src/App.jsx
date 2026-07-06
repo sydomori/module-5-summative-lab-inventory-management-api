@@ -6,7 +6,13 @@ export default function App(){
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
+  const [barcode, setBarcode] = useState('')
+  const [inStock, setInStock] = useState('')
+  const [price, setPrice] = useState('')
+  const [formError, setFormError] = useState(null)
+
+  const fetchItems = () => {
+    setLoading(true)
     fetch('/api/inventory')
       .then((response) => {
         if (!response.ok) {
@@ -22,6 +28,11 @@ export default function App(){
         setError(error)
         setLoading(false)
       })
+  }
+  
+  /* Fetch the items when the component mounts */
+  useEffect(() => {
+    fetchItems()
   }, [])
 
   if (loading) {
