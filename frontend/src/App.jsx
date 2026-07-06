@@ -112,7 +112,7 @@ export default function App(){
         <ul>
           {items.map((item) => (
             <li key={item.id}>
-              {item.name} - {item.brand} - {item.price} - Stock: {item.in_stock}
+              {item.name} <br /> -brand: {item.brand} <br /> - ingredients: {item.ingredients} <br /> - price: ${item.price} <br /> - stock: {item.in_stock}
             </li>
           ))}
         </ul>
