@@ -11,6 +11,50 @@ export default function App(){
   const [price, setPrice] = useState('')
   const [formError, setFormError] = useState(null)
 
+  const [editingId, setEditingId] = useState(null)
+  const [editInStock, setEditInStock] = useState('')
+  const [editPrice, setEditPrice] = useState('')
+
+  const startEditing = (item) => {
+    setEditingId(item.id)
+    setEditInStock(item.in_stock)
+    setEditPrice(item.price)
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+    setEditInStock('')
+    setEditPrice('')
+  }
+
+  const handleUpdate = (e) => {
+    fetch(`/api/inventory/${id}`,{
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        in_stock: Number(editInStock, 10),
+        price: Number(editPrice),
+      }),
+    })
+    .then((response) => {
+      if(!response.ok){
+        return response.json().then((data) => {
+          throw new Error(data.error || 'Failed to update item')
+        })
+      }
+      return response.json()
+    })
+    .then(()=>{
+      cancelEditing()
+      fetchItems()
+    })
+    .catch((error) => {
+      setError(error.message)
+    })
+  }
+
   const fetchItems = () => {
     setLoading(true)
     fetch('/api/inventory')
