@@ -69,6 +69,26 @@ export default function App(){
       })
   }
 
+  const handleDelete = (id) => {
+    fetch(`/api/inventory/${id}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.error || 'Failed to delete item')
+          })
+        }
+        return response.json()
+      })
+      .then((data) => {
+        fetchItems()
+      })
+      .catch((error) => {
+        setError(error.message)
+      })
+  }
+
   if (loading) {
     return <div>Loading Inventory...</div>
   }
